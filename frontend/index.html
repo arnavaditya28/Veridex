@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Veridex | Public Information Reliability</title>
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/auth.css"> <!-- NEW -->
+  <link rel="stylesheet" href="css/auth.css">
 </head>
+
 <body>
 
   <!-- NAVBAR -->
@@ -19,9 +21,9 @@
       <a href="submit.html">Submit Claim</a>
       <a href="discussion.html">Discussion</a>
       <a href="about.html">About</a>
+      <a href="profile.html" id="profileNavLink" class="hidden">Profile</a>
       <a href="moderator.html" style="display:none;">Moderator</a>
 
-      <!-- AUTH BUTTONS ADDED -->
       <button id="openAuthModal" class="auth-btn">Login / Signup</button>
       <button id="logoutBtn" class="auth-btn hidden">Logout</button>
     </nav>
@@ -52,51 +54,31 @@
   <!-- HOW IT WORKS -->
   <section class="info-section works-bg">
     <h2>How Veridex Works</h2>
-
     <div class="works-layout">
-
       <div class="works-text">
-
         <div class="info-card">
           <h3>1. Claim Submission</h3>
-          <p>
-            Users submit publicly circulating information or claims without
-            revealing their identity. Claims remain neutral at the time of
-            submission.
-          </p>
+          <p>Users submit publicly circulating information or claims without revealing their identity. Claims remain
+            neutral at the time of submission.</p>
         </div>
-
         <div class="info-card">
           <h3>2. Source Attachment</h3>
-          <p>
-            Supporting sources such as official notices, media reports, or
-            public references can be attached to provide context and evidence.
-          </p>
+          <p>Supporting sources such as official notices, media reports, or public references can be attached to provide
+            context and evidence.</p>
         </div>
-
         <div class="info-card">
           <h3>3. Rule-Based Evaluation</h3>
-          <p>
-            The system applies predefined, deterministic rules based on source
-            type, count, freshness, and consistency to generate reliability
-            indicators.
-          </p>
+          <p>The system applies predefined, deterministic rules based on source type, count, freshness, and consistency
+            to generate reliability indicators.</p>
         </div>
-
         <div class="info-card">
           <h3>4. AI-Assisted Analysis (Advisory)</h3>
-          <p>
-            Artificial intelligence is used only to structure claims, detect
-            similarities, highlight conflicts, and summarize information.
-            AI does not determine factual correctness or override system rules.
-          </p>
+          <p>Artificial intelligence is used only to structure claims, detect similarities, highlight conflicts, and
+            summarize information. AI does not determine factual correctness or override system rules.</p>
         </div>
-
       </div>
-
       <div class="works-image">
-        <img src="images/how-it-works.jpg"
-             alt="Rule-based and AI-assisted verification workflow">
+        <img src="images/how-it-works.jpg" alt="Rule-based and AI-assisted verification workflow">
       </div>
     </div>
   </section>
@@ -104,47 +86,31 @@
   <!-- WHY IT MATTERS -->
   <section class="info-section bg-image">
     <h2>Why Veridex Matters</h2>
-
     <p class="center-text light-text lead-text">
-      In an age of rapid information sharing, misinformation often spreads
-      faster than verification. Veridex provides a structured and transparent
-      mechanism to assess reliability while preserving user autonomy and
-      interpretive freedom.
+      In an age of rapid information sharing, misinformation often spreads faster than verification. Veridex provides a
+      structured and transparent mechanism to assess reliability while preserving user autonomy and interpretive
+      freedom.
     </p>
-
     <div class="info-grid">
-
       <div class="info-card glass">
         <h3>Transparency</h3>
-        <p>
-          Reliability indicators are derived from explainable rules and visible
-          signals rather than opaque or black-box decisions.
-        </p>
+        <p>Reliability indicators are derived from explainable rules and visible signals rather than opaque or black-box
+          decisions.</p>
       </div>
-
       <div class="info-card glass">
         <h3>Public-Centric</h3>
-        <p>
-          Designed for students, citizens, and organizations dealing with
-          widely shared public information.
-        </p>
+        <p>Designed for students, citizens, and organizations dealing with widely shared public information.</p>
       </div>
-
       <div class="info-card glass">
         <h3>Ethically Safe</h3>
-        <p>
-          The platform avoids automated truth judgments and does not suppress
-          discussion or dissenting viewpoints.
-        </p>
+        <p>The platform avoids automated truth judgments and does not suppress discussion or dissenting viewpoints.</p>
       </div>
-
     </div>
   </section>
 
   <!-- CORE PRINCIPLES -->
   <section class="info-section works-bg">
     <h2>Core System Principles</h2>
-
     <ul class="principles">
       <li>✔ Reliability is not equivalent to absolute truth</li>
       <li>✔ Evaluations are deterministic and rule-based</li>
@@ -157,12 +123,9 @@
   <!-- AI DISCLAIMER -->
   <section class="info-section">
     <h2>AI Usage Disclaimer</h2>
-    <p class="center-text">
-      Any AI-generated insights on Veridex are intended solely to assist users
-      by organizing information, detecting patterns, and highlighting
-      uncertainty. The platform does not rely on artificial intelligence to
-      declare information as true or false.
-    </p>
+    <p class="center-text">Any AI-generated insights on Veridex are intended solely to assist users by organizing
+      information, detecting patterns, and highlighting uncertainty. The platform does not rely on artificial
+      intelligence to declare information as true or false.</p>
   </section>
 
   <!-- FOOTER -->
@@ -170,26 +133,20 @@
     <p>© 2026 Veridex · Public Information Reliability Platform</p>
   </footer>
 
-  <!-- ================= AUTH MODAL ================= -->
+  <!-- AUTH MODAL -->
   <div id="authModal" class="auth-modal hidden">
     <div class="auth-box">
       <span id="closeAuthModal" class="close-btn">&times;</span>
-
       <h2 id="authTitle">Login</h2>
-
       <input type="email" id="authEmail" placeholder="Email">
       <input type="password" id="authPassword" placeholder="Password">
-
       <button id="authSubmitBtn">Login</button>
-
-      <p class="switch-text">
-        <span id="switchAuthMode">Don't have an account? Signup</span>
-      </p>
-
+      <p class="switch-text"><span id="switchAuthMode">Don't have an account? Signup</span></p>
       <p id="authMessage" class="auth-message"></p>
     </div>
   </div>
 
   <script src="js/app.js"></script>
 </body>
+
 </html>

@@ -3,142 +3,117 @@
 <head>
   <meta charset="UTF-8" />
   <title>Veridex | About</title>
-
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/about.css" />
   <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/about.css" />
 </head>
 <body>
 
-<!-- ================= NAVBAR ================= -->
+<!-- NAVBAR -->
 <header class="navbar">
-  <div class="logo">
-    Veridex
-    <span class="logo-tagline">Public Information Reliability</span>
-  </div>
-
+  <div class="logo">Veridex <span class="logo-tagline">Public Information Reliability</span></div>
   <nav>
     <a href="index.html">Home</a>
     <a href="submit.html">Submit Claim</a>
     <a href="discussion.html">Discussion</a>
     <a href="about.html" class="active">About</a>
+    <a href="profile.html" id="profileNavLink" class="hidden">Profile</a>
     <a href="moderator.html" style="display:none;">Moderator</a>
-
     <button id="openAuthModal" class="auth-btn">Login / Signup</button>
     <button id="logoutBtn" class="auth-btn hidden">Logout</button>
   </nav>
 </header>
 
-<!-- ================= HERO ================= -->
+<!-- HERO -->
 <section class="about-hero">
-  <div class="about-hero-content">
-    <h1>About Veridex</h1>
-    <p>Transparency through structured discussion</p>
-  </div>
+  <h1>About Veridex</h1>
+  <p>Transparency through structured discussion and rule-based reliability evaluation</p>
 </section>
 
-<!-- ================= MAIN ================= -->
-<main class="container">
+<main class="about-container">
 
-  <section class="card">
-    <h2>What is Veridex?</h2>
+  <div class="acard">
+    <h2>🔍 What is Veridex?</h2>
     <p>
-      <b>Veridex</b> is a claim verification and discussion platform that enables
-      users to critically evaluate information through community-driven analysis.
-      Each claim has its own discussion space to encourage structured debate.
+      <b>Veridex</b> is a claim verification and community discussion platform that enables
+      users to critically evaluate publicly circulating information. Each claim has a dedicated
+      discussion space and a transparent, rule-based reliability score — no black-box decisions.
     </p>
-  </section>
+  </div>
 
-  <section class="card">
-    <h2>Problem Statement</h2>
+  <div class="acard">
+    <h2>⚠️ Problem Statement</h2>
     <p>
-      Misinformation spreads rapidly across digital platforms, often without
-      accountability or context. Users lack tools to evaluate claims objectively.
+      Misinformation spreads across digital platforms without accountability or context.
+      Citizens and organizations lack structured tools to evaluate claims objectively,
+      distinguish reliable sources from unreliable ones, or trace the origin of widely shared information.
     </p>
-  </section>
+  </div>
 
-  <section class="card">
-    <h2>Our Approach</h2>
+  <div class="acard">
+    <h2>💡 Our Approach</h2>
     <ul>
-      <li>Claim-specific discussion boards</li>
-      <li>Multiple content formats</li>
-      <li>Authenticated participation</li>
-      <li>Community voting and replies</li>
-      <li>Discussion maturity indicators</li>
+      <li>Claim-specific discussion boards for structured debate</li>
+      <li>Multiple content formats — text, links, images, polls</li>
+      <li>Authenticated participation with Trust Scores</li>
+      <li>Community voting, replies, and moderation</li>
+      <li>Deterministic reliability indicators — no AI decides truth</li>
     </ul>
-  </section>
+  </div>
 
-  <section class="card">
-    <h2>Technology Stack</h2>
-    <ul>
-      <li><b>Frontend:</b> HTML, CSS, JavaScript</li>
-      <li><b>Backend:</b> Node.js, Express</li>
-      <li><b>Database:</b> MongoDB</li>
-    </ul>
-  </section>
+  <div class="acard">
+    <h2>⚙️ Technology Stack</h2>
+    <div class="stack-grid">
+      <div class="stack-item"><div class="stack-label">Frontend</div><div class="stack-val">HTML · CSS · Vanilla JS</div></div>
+      <div class="stack-item"><div class="stack-label">Backend</div><div class="stack-val">Node.js · Express</div></div>
+      <div class="stack-item"><div class="stack-label">Database</div><div class="stack-val">MongoDB · Mongoose</div></div>
+    </div>
+  </div>
 
-  <!-- CONNECT -->
-  <section class="card connect-card">
-    <h2>Connect With Us</h2>
-
+  <div class="acard connect-card">
+    <h2>🌐 Connect With Us</h2>
     <div class="social-links">
-      <a href="https://instagram.com" target="_blank">
-        <img src="images/insta.jpg" alt="Instagram">
+      <a class="social-btn" href="https://instagram.com" target="_blank">
+        <img src="images/insta.jpg" alt="Instagram"> Instagram
       </a>
-
-      <a href="https://youtube.com" target="_blank">
-        <img src="images/yt.jpg" alt="YouTube">
+      <a class="social-btn" href="https://youtube.com" target="_blank">
+        <img src="images/yt.jpg" alt="YouTube"> YouTube
       </a>
-
-      <a href="mailto:veridex.moderator@gmail.com">
-        <img src="images/mail.png" alt="Email">
+      <a class="social-btn" href="mailto:veridex.moderator@gmail.com">
+        <img src="images/mail.png" alt="Email"> Email Us
       </a>
-
-      <a href="https://linkedin.com" target="_blank">
-        <img src="images/link.png" alt="LinkedIn">
+      <a class="social-btn" href="https://linkedin.com" target="_blank">
+        <img src="images/link.png" alt="LinkedIn"> LinkedIn
       </a>
     </div>
-  </section>
+  </div>
 
-  <!-- FEEDBACK -->
-  <section class="card feedback-card">
-    <h2>Send Feedback to the Moderator</h2>
-
+  <div class="acard feedback-card">
+    <h2>📬 Send Feedback to the Moderator</h2>
     <form id="feedbackForm">
       <input type="text" id="fbName" placeholder="Your name" required />
       <input type="email" id="fbEmail" placeholder="Your email" required />
-      <textarea
-        id="fbMessage"
-        placeholder="Your suggestions or feedback..."
-        required
-      ></textarea>
-
+      <textarea id="fbMessage" placeholder="Your suggestions or feedback..." required></textarea>
       <button type="submit">Send Feedback</button>
     </form>
-
-    <p class="feedback-note">
-      Feedback is stored and forwarded to the moderator for review.
-    </p>
-  </section>
+    <p class="feedback-note">Feedback is stored and forwarded to the moderator for review.</p>
+  </div>
 
 </main>
+
+<footer class="footer">
+  © 2026 Veridex · Public Information Reliability Platform
+</footer>
 
 <!-- AUTH MODAL -->
 <div id="authModal" class="auth-modal hidden">
   <div class="auth-box">
     <span id="closeAuthModal" class="close-btn">&times;</span>
-
     <h2 id="authTitle">Login</h2>
-
     <input type="email" id="authEmail" placeholder="Email">
     <input type="password" id="authPassword" placeholder="Password">
-
     <button id="authSubmitBtn">Login</button>
-
-    <p class="switch-text">
-      <span id="switchAuthMode">Don't have an account? Signup</span>
-    </p>
-
+    <p class="switch-text"><span id="switchAuthMode">Don't have an account? Signup</span></p>
     <p id="authMessage" class="auth-message"></p>
   </div>
 </div>

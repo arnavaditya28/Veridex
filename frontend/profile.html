@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Veridex | Profile</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; margin: 0; color: #1e293b; }
+    .profile-hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); padding: 48px 20px 60px; text-align: center; }
+    .avatar-wrap { position: relative; display: inline-block; margin-bottom: 16px; }
+    .avatar { width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg, #0ea5e9, #0284c7); display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 700; color: white; border: 4px solid rgba(255,255,255,0.2); margin: 0 auto; }
+    .verified-badge { position: absolute; bottom: 2px; right: 2px; background: #22c55e; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; border: 2px solid white; }
+    .profile-displayname { font-size: 26px; font-weight: 700; color: #f1f5f9; margin: 0 0 4px; }
+    .profile-username-tag { font-size: 14px; color: #94a3b8; margin-bottom: 8px; display: block; }
+    .profile-role-badge { display: inline-block; padding: 3px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-bottom: 10px; background: rgba(14,165,233,0.2); color: #38bdf8; border: 1px solid rgba(14,165,233,0.3); }
+    .profile-bio { color: #94a3b8; font-size: 14px; max-width: 440px; margin: 0 auto 6px; line-height: 1.5; }
+    .profile-location { color: #64748b; font-size: 13px; margin-bottom: 6px; }
+    .joined-date { color: #475569; font-size: 12px; }
+    .quick-stats { display: flex; justify-content: center; gap: 32px; margin-top: 24px; flex-wrap: wrap; }
+    .qs-item { text-align: center; }
+    .qs-value { font-size: 22px; font-weight: 700; color: #38bdf8; display: block; }
+    .qs-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+    .profile-body { max-width: 960px; margin: -28px auto 60px; padding: 0 16px; position: relative; }
+    .pcard { background: white; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); padding: 24px; margin-bottom: 20px; }
+    .pcard h3 { font-size: 15px; font-weight: 700; color: #0f172a; margin: 0 0 18px; display: flex; align-items: center; gap: 8px; }
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 640px) { .profile-grid { grid-template-columns: 1fr; } }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .form-group input, .form-group textarea { width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px; color: #1e293b; background: #f8fafc; font-family: inherit; }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #0ea5e9; background: white; }
+    .form-group textarea { min-height: 70px; resize: vertical; }
+    .char-count { font-size: 11px; color: #94a3b8; text-align: right; margin-top: 3px; }
+    .save-btn { background: linear-gradient(135deg, #0ea5e9, #0284c7); border: none; border-radius: 999px; padding: 10px 28px; color: white; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .save-btn:hover { opacity: 0.88; }
+    .profile-msg { font-size: 13px; margin-top: 10px; min-height: 18px; }
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-lbl { color: #64748b; }
+    .stat-val { font-weight: 600; color: #0f172a; }
+    .stat-val.blue { color: #0ea5e9; }
+    .badges-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .badge-pill { display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+    .badge-pill.earned { background: rgba(14,165,233,0.1); color: #0284c7; border-color: rgba(14,165,233,0.3); }
+    .badge-pill.new-badge { background: rgba(234,179,8,0.12); color: #b45309; border-color: rgba(234,179,8,0.35); animation: badge-pop .4s cubic-bezier(.175,.885,.32,1.275); }
+    @keyframes badge-pop { 0%{transform:scale(0.7);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-lbl { color: #475569; }
+    .toggle-switch { position: relative; width: 40px; height: 22px; background: #cbd5e1; border-radius: 999px; cursor: pointer; transition: background .2s; }
+    .toggle-switch.on { background: #0ea5e9; }
+    .toggle-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: transform .2s; }
+    .toggle-switch.on::after { transform: translateX(18px); }
+    .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-lbl { color: #64748b; }
+    .info-val { font-weight: 500; color: #0f172a; word-break: break-all; text-align: right; max-width: 60%; }
+    .public-notice { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #0369a1; margin-bottom: 20px; }
+    /* Trust score breakdown */
+    .trust-breakdown { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .trust-row { display: flex; flex-direction: column; gap: 4px; }
+    .trust-row-header { display: flex; justify-content: space-between; font-size: 13px; }
+    .trust-row-label { color: #475569; }
+    .trust-row-val { font-weight: 600; color: #0ea5e9; }
+    .trust-bar-track { height: 6px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+    .trust-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #0ea5e9, #0284c7); transition: width .6s ease; }
+    /* Score table */
+    .score-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .score-table th { text-align: left; padding: 8px 12px; background: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+    .score-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    .score-table tr:last-child td { border-bottom: none; }
+    .score-pts { font-weight: 700; color: #0ea5e9; }
+    .badge-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 560px) { .badge-detail-grid { grid-template-columns: 1fr; } }
+    .badge-detail-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; }
+    .badge-detail-item .bdi-head { font-weight: 700; font-size: 14px; color: #0f172a; margin-bottom: 4px; }
+    .badge-detail-item .bdi-desc { font-size: 12px; color: #64748b; line-height: 1.5; }
+    .conf-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
+    .conf-row:last-child { border-bottom: none; }
+    .conf-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    /* Moderator-only panel */
+    .mod-only-panel { background: #fefce8; border: 1px solid #fde68a; border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; }
+    .mod-only-panel h3 { color: #92400e; font-size: 15px; font-weight: 700; margin: 0 0 16px; }
+    .mod-only-note { font-size: 12px; color: #b45309; margin-top: 10px; font-style: italic; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR (uniform) -->
+<header class="navbar">
+  <div class="logo">Veridex <span class="logo-tagline">Public Information Reliability</span></div>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="submit.html">Submit Claim</a>
+    <a href="discussion.html">Discussion</a>
+    <a href="about.html">About</a>
+    <a href="profile.html" id="profileNavLink" class="hidden">Profile</a>
+    <a href="moderator.html" style="display:none;">Moderator</a>
+    <button id="openAuthModal" class="auth-btn">Login / Signup</button>
+    <button id="logoutBtn" class="auth-btn hidden">Logout</button>
+  </nav>
+</header>
+
+<section class="profile-hero">
+  <div class="avatar-wrap">
+    <div class="avatar" id="profileAvatar">?</div>
+    <div class="verified-badge" id="verifiedBadge" style="display:none">✓</div>
+  </div>
+  <div class="profile-displayname" id="profileDisplayName">Loading...</div>
+  <span class="profile-username-tag" id="profileUsernameTag"></span>
+  <div class="profile-role-badge" id="profileRole"></div>
+  <div class="profile-bio" id="profileBio"></div>
+  <div class="profile-location" id="profileLocation"></div>
+  <div class="joined-date" id="profileJoined"></div>
+  <div class="quick-stats">
+    <div class="qs-item"><span class="qs-value" id="qsPosts">0</span><span class="qs-label">Posts</span></div>
+    <div class="qs-item"><span class="qs-value" id="qsClaims">0</span><span class="qs-label">Claims</span></div>
+    <div class="qs-item"><span class="qs-value" id="qsUpvotes">0</span><span class="qs-label">Upvotes</span></div>
+    <div class="qs-item"><span class="qs-value" id="qsKarma">0</span><span class="qs-label">Reputation</span></div>
+  </div>
+</section>
+
+<main class="profile-body">
+
+  <div class="public-notice" id="publicNotice" style="display:none">👁️ You are viewing a public profile.</div>
+
+  <div id="editSection" style="display:none">
+    <div class="pcard">
+      <h3>✏️ Edit Profile</h3>
+      <div class="form-group"><label>Display Name</label><input type="text" id="inputDisplayName" placeholder="Your display name" maxlength="50" /></div>
+      <div class="form-group"><label>Username</label><input type="text" id="inputUsername" placeholder="letters, numbers, underscores (3-30 chars)" maxlength="30" /></div>
+      <div class="form-group">
+        <label>Bio <span style="color:#94a3b8;font-weight:400">(max 160 chars)</span></label>
+        <textarea id="inputBio" placeholder="Short intro about yourself..." maxlength="160" oninput="document.getElementById('bioCount').textContent=this.value.length+'/160'"></textarea>
+        <div class="char-count" id="bioCount">0/160</div>
+      </div>
+      <div class="form-group"><label>Location <span style="color:#94a3b8;font-weight:400">(optional)</span></label><input type="text" id="inputLocation" placeholder="City, Country" maxlength="60" /></div>
+      <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+      <div class="profile-msg" id="profileMsg"></div>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+
+    <div class="pcard">
+      <h3>📊 Activity Stats</h3>
+      <div class="stat-row"><span class="stat-lbl">Posts Created</span><span class="stat-val blue" id="statPosts">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">Claims Submitted</span><span class="stat-val blue" id="statClaims">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">Comments Made</span><span class="stat-val blue" id="statComments">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">Upvotes Received</span><span class="stat-val blue" id="statUpvotes">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">Downvotes Received</span><span class="stat-val" id="statDownvotes">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">Reputation Points</span><span class="stat-val blue" id="statKarma">0</span></div>
+    </div>
+
+    <div class="pcard">
+      <h3>🔷 Account Info</h3>
+      <div class="info-row"><span class="info-lbl">Email</span><span class="info-val" id="infoEmail">—</span></div>
+      <div class="info-row"><span class="info-lbl">Role</span><span class="info-val" id="infoRole">—</span></div>
+      <div class="info-row"><span class="info-lbl">Account Status</span><span class="info-val" id="infoStatus">—</span></div>
+      <div class="info-row"><span class="info-lbl">Joined</span><span class="info-val" id="infoJoined">—</span></div>
+      <div class="info-row"><span class="info-lbl">Last Active</span><span class="info-val" id="infoLastActive">—</span></div>
+    </div>
+
+    <div class="pcard">
+      <h3>🏅 Badges Earned</h3>
+      <div class="badges-grid" id="badgesGrid"><span style="color:#94a3b8;font-size:13px">No badges yet</span></div>
+    </div>
+
+    <!-- Trust Score Card -->
+    <div class="pcard">
+      <h3>🔒 Trust Score</h3>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
+        <div style="font-size:42px;font-weight:800;color:#0ea5e9;line-height:1;" id="trustScoreDisplay">—</div>
+        <div>
+          <div style="font-size:12px;color:#64748b;margin-bottom:2px;">out of 100</div>
+          <div style="font-size:13px;font-weight:600;" id="trustLabel">—</div>
+        </div>
+      </div>
+      <div class="trust-breakdown" id="trustBreakdown"></div>
+    </div>
+
+    <div class="pcard" id="privacySection" style="display:none">
+      <h3>🔒 Privacy Settings</h3>
+      <div class="toggle-row"><span class="toggle-lbl">Public Profile</span><div class="toggle-switch on" id="togglePublic" onclick="togglePrivacy('public')"></div></div>
+      <div class="toggle-row"><span class="toggle-lbl">Show Email Publicly</span><div class="toggle-switch" id="toggleEmail" onclick="togglePrivacy('email')"></div></div>
+      <div class="toggle-row"><span class="toggle-lbl">Show Last Active</span><div class="toggle-switch on" id="toggleLastActive" onclick="togglePrivacy('lastActive')"></div></div>
+      <div class="toggle-row"><span class="toggle-lbl">Email Notifications</span><div class="toggle-switch on" id="toggleNotifs" onclick="togglePrivacy('notifs')"></div></div>
+      <p style="font-size:12px;color:#94a3b8;margin-top:12px">Privacy preferences are saved locally on this device.</p>
+    </div>
+
+  </div>
+
+  <!-- MODERATOR ONLY: Reliability Calculation -->
+  <div class="mod-only-panel" id="modReliabilityPanel" style="display:none">
+    <h3>🔐 How is the Reliability Score Calculated? (Moderator View)</h3>
+    <p style="font-size:13px;color:#92400e;margin:0 0 16px;line-height:1.7;">
+      This section is only visible to moderators. It shows the exact deterministic rules used to compute every claim's reliability score.
+    </p>
+    <table class="score-table">
+      <thead>
+        <tr><th>Rule</th><th>Condition</th><th>Points</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>🏛️ Official Source</td><td>Government, international org URL or document</td><td class="score-pts">+40</td></tr>
+        <tr><td>📄 Document Source</td><td>PDF report, whitepaper, official publication</td><td class="score-pts">+30</td></tr>
+        <tr><td>📰 Media Source</td><td>News organization article or report</td><td class="score-pts">+25</td></tr>
+        <tr><td>💬 Social/Public Source</td><td>Social media post, public forum</td><td class="score-pts">+10</td></tr>
+        <tr><td>🌐 Diversity Bonus</td><td>2+ different source types</td><td class="score-pts">+10</td></tr>
+        <tr><td>🌐 Strong Diversity</td><td>3+ different source types</td><td class="score-pts">+10</td></tr>
+        <tr><td>⏱️ Freshness Bonus</td><td>Submitted within last 7 days</td><td class="score-pts">+10</td></tr>
+        <tr><td>⏱️ Moderate Freshness</td><td>Submitted within last 30 days</td><td class="score-pts">+5</td></tr>
+        <tr><td>✅ Moderator Verified</td><td>Source marked relevant by moderator</td><td class="score-pts">+10</td></tr>
+        <tr><td>❌ Irrelevant Source</td><td>Moderator marked source as irrelevant</td><td class="score-pts">−15</td></tr>
+        <tr><td>🕰️ Outdated Source</td><td>Moderator marked source as outdated</td><td class="score-pts">−10</td></tr>
+        <tr><td colspan="2" style="font-weight:700;color:#1e293b">Maximum Score (capped)</td><td class="score-pts">100</td></tr>
+      </tbody>
+    </table>
+    <p class="mod-only-note">⚠️ This breakdown is hidden from regular users and verified users. Only moderators can see the exact scoring formula.</p>
+  </div>
+
+  <!-- BADGES EXPLAINED -->
+  <div class="pcard">
+    <h3>🏅 Badge System — How to Earn Them</h3>
+    <p style="font-size:13px;color:#64748b;margin:0 0 16px;line-height:1.7;">
+      Badges are awarded automatically based on your activity. Some can be earned quickly!
+    </p>
+    <div class="badge-detail-grid">
+      <div class="badge-detail-item" style="border-color:#fde68a;background:#fffbeb">
+        <div class="bdi-head">📝 First Claim</div>
+        <div class="bdi-desc">Submit your very first claim on Veridex. Earn this immediately on your first submission!</div>
+      </div>
+      <div class="badge-detail-item" style="border-color:#fde68a;background:#fffbeb">
+        <div class="bdi-head">💬 First Post</div>
+        <div class="bdi-desc">Create your first discussion post. Awarded instantly the first time you post in discussions.</div>
+      </div>
+      <div class="badge-detail-item">
+        <div class="bdi-head">🧠 Fact Checker</div>
+        <div class="bdi-desc">Perform 10+ verified fact-checks with at least 80% accuracy rate.</div>
+      </div>
+      <div class="badge-detail-item">
+        <div class="bdi-head">🔥 Top Contributor</div>
+        <div class="bdi-desc">Reach 50+ combined posts and comments, or be in the top 10% of monthly contributors.</div>
+      </div>
+      <div class="badge-detail-item">
+        <div class="bdi-head">🛡️ Trusted User</div>
+        <div class="bdi-desc">Maintain an active account for 90+ days with a Trust Score above 75.</div>
+      </div>
+      <div class="badge-detail-item">
+        <div class="bdi-head">⭐ Rising Star</div>
+        <div class="bdi-desc">Achieve a Trust Score of 60+ within your first 30 days on the platform.</div>
+      </div>
+      <div class="badge-detail-item">
+        <div class="bdi-head">💎 Expert Verified</div>
+        <div class="bdi-desc">Reach a Trust Score of 90+ or get individually verified by a moderator.</div>
+      </div>
+      <div class="badge-detail-item">
+        <div class="bdi-head">🕊️ Peacemaker</div>
+        <div class="bdi-desc">Receive 100+ upvotes across all posts with 2 or fewer community reports.</div>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9;">
+      ✅ Verified badge (green ✓ on avatar) is given when your email is confirmed and account is active.
+    </p>
+  </div>
+
+</main>
+
+<div id="authModal" class="auth-modal hidden">
+  <div class="auth-box">
+    <span id="closeAuthModal" class="close-btn">&times;</span>
+    <h2 id="authTitle">Login</h2>
+    <input type="email" id="authEmail" placeholder="Email">
+    <input type="password" id="authPassword" placeholder="Password">
+    <button id="authSubmitBtn">Login</button>
+    <p class="switch-text"><span id="switchAuthMode">Don't have an account? Signup</span></p>
+    <p id="authMessage" class="auth-message"></p>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+const API = (typeof API_BASE !== "undefined" ? API_BASE : "http://localhost:3001");
+const token = localStorage.getItem("veridex_token");
+const urlParams = new URLSearchParams(window.location.search);
+const viewUsername = urlParams.get("u");
+
+const BADGE_DEFS = {
+  firstClaim:        { icon: "📝", name: "First Claim",        new: true },
+  firstPost:         { icon: "💬", name: "First Post",          new: true },
+  factChecker:       { icon: "🧠", name: "Fact Checker" },
+  topContributor:    { icon: "🔥", name: "Top Contributor" },
+  trustedUser:       { icon: "🛡️", name: "Trusted User" },
+  risingStar:        { icon: "⭐", name: "Rising Star" },
+  expertVerified:    { icon: "💎", name: "Expert Verified" },
+  earlyAdopter:      { icon: "🚀", name: "Early Adopter" },
+  discussionStarter: { icon: "💬", name: "Discussion Starter" },
+  peacemaker:        { icon: "🕊️", name: "Peacemaker" }
+};
+
+const privPrefs = JSON.parse(localStorage.getItem("veridex_privacy") || '{"public":true,"email":false,"lastActive":true,"notifs":true}');
+function savePrivPrefs() { localStorage.setItem("veridex_privacy", JSON.stringify(privPrefs)); }
+function togglePrivacy(key) {
+  privPrefs[key] = !privPrefs[key];
+  savePrivPrefs();
+  const el = document.getElementById("toggle" + key.charAt(0).toUpperCase() + key.slice(1));
+  if (el) el.classList.toggle("on", privPrefs[key]);
+}
+
+function formatDate(d) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+function formatRelative(d) {
+  if (!d) return "—";
+  const s = Math.floor((Date.now() - new Date(d)) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s/60)}m ago`;
+  if (s < 86400) return `${Math.floor(s/3600)}h ago`;
+  return `${Math.floor(s/86400)}d ago`;
+}
+
+function renderBadges(badges) {
+  const grid = document.getElementById("badgesGrid");
+  if (!badges || badges.length === 0) {
+    grid.innerHTML = '<span style="color:#94a3b8;font-size:13px">No badges yet — keep contributing!</span>';
+    return;
+  }
+  grid.innerHTML = badges.map(b => {
+    const def = BADGE_DEFS[b];
+    if (!def) return "";
+    const cls = def.new ? "badge-pill earned new-badge" : "badge-pill earned";
+    return `<div class="${cls}" title="${def.name}">${def.icon} ${def.name}</div>`;
+  }).join("");
+}
+
+function renderTrustScore(data) {
+  const score = data.trustScore ?? 0;
+  document.getElementById("trustScoreDisplay").textContent = score;
+
+  let label = "Needs Improvement", color = "#dc2626";
+  if (score >= 85) { label = "Highly Reliable"; color = "#16a34a"; }
+  else if (score >= 65) { label = "Reliable"; color = "#2563eb"; }
+  else if (score >= 40) { label = "Needs Review"; color = "#f59e0b"; }
+  const lbl = document.getElementById("trustLabel");
+  lbl.textContent = label; lbl.style.color = color;
+
+  // Breakdown bars
+  const totalVotes = (data.upvotes ?? 0) + (data.downvotes ?? 0);
+  const upvoteRatio = totalVotes > 0 ? ((data.upvotes ?? 0) / totalVotes) * 100 : 50;
+  const accountAgeDays = data.joinedAt ? Math.floor((Date.now() - new Date(data.joinedAt)) / 86400000) : 0;
+  const ageScore = Math.min(100, (accountAgeDays / 365) * 100);
+  const reportPenalty = Math.min(100, (data.reportsReceived ?? 0) * 10);
+  const reportScore = Math.max(0, 100 - reportPenalty);
+  const verificationScore = (data.isVerified || data.role === "verified" || data.role === "moderator") ? 100 : 0;
+
+  const rows = [
+    { label: "Fact-check Accuracy (30%)", val: data.factCheckAccuracy ?? 0, weight: 0.3 },
+    { label: "Content Quality — upvote ratio (25%)", val: Math.round(upvoteRatio), weight: 0.25 },
+    { label: "Account Age (15%)", val: Math.round(ageScore), weight: 0.15 },
+    { label: "Community Reports — fewer = higher (15%)", val: Math.round(reportScore), weight: 0.15 },
+    { label: "Verification Status (15%)", val: verificationScore, weight: 0.15 }
+  ];
+
+  document.getElementById("trustBreakdown").innerHTML = rows.map(r => `
+    <div class="trust-row">
+      <div class="trust-row-header">
+        <span class="trust-row-label">${r.label}</span>
+        <span class="trust-row-val">${r.val}%</span>
+      </div>
+      <div class="trust-bar-track"><div class="trust-bar-fill" style="width:${r.val}%"></div></div>
+    </div>
+  `).join("");
+}
+
+function populate(data, isOwn) {
+  const name = data.displayName || data.username || data.email?.split("@")[0] || "?";
+  document.getElementById("profileAvatar").textContent = name.replace("@","")[0].toUpperCase();
+  document.getElementById("profileDisplayName").textContent = data.displayName || ("@" + (data.username || name));
+  document.getElementById("profileUsernameTag").textContent = data.username ? "@" + data.username : "";
+  document.getElementById("profileRole").textContent = (data.role||"").charAt(0).toUpperCase() + (data.role||"").slice(1);
+  document.getElementById("profileBio").textContent = data.bio || (isOwn ? "No bio yet — add one below!" : "");
+  document.getElementById("profileLocation").textContent = data.location ? "📍 " + data.location : "";
+  document.getElementById("profileJoined").textContent = data.joinedAt ? "Joined " + new Date(data.joinedAt).toLocaleDateString("en-US", {year:"numeric",month:"long"}) : "";
+
+  if (data.role === "verified" || data.isVerified || data.role === "moderator") {
+    document.getElementById("verifiedBadge").style.display = "flex";
+  }
+
+  document.getElementById("qsPosts").textContent = data.postCount ?? 0;
+  document.getElementById("qsClaims").textContent = data.claimCount ?? 0;
+  document.getElementById("qsUpvotes").textContent = data.upvotes ?? 0;
+  document.getElementById("qsKarma").textContent = data.karma ?? 0;
+
+  document.getElementById("statPosts").textContent = data.postCount ?? 0;
+  document.getElementById("statClaims").textContent = data.claimCount ?? 0;
+  document.getElementById("statComments").textContent = data.commentCount ?? 0;
+  document.getElementById("statUpvotes").textContent = data.upvotes ?? 0;
+  document.getElementById("statDownvotes").textContent = data.downvotes ?? 0;
+  document.getElementById("statKarma").textContent = data.karma ?? 0;
+
+  document.getElementById("infoRole").textContent = (data.role||"").charAt(0).toUpperCase() + (data.role||"").slice(1);
+  document.getElementById("infoStatus").textContent = data.accountStatus || "—";
+  document.getElementById("infoJoined").textContent = formatDate(data.joinedAt);
+  document.getElementById("infoEmail").textContent = isOwn ? (data.email || "—") : "Hidden";
+  document.getElementById("infoLastActive").textContent = formatRelative(data.lastActive);
+
+  renderBadges(data.badges);
+  renderTrustScore(data);
+
+  // Show moderator-only reliability panel
+  if (data.role === "moderator") {
+    document.getElementById("modReliabilityPanel").style.display = "block";
+  }
+}
+
+async function loadProfile() {
+  try {
+    if (viewUsername) {
+      document.getElementById("publicNotice").style.display = "block";
+      const res = await fetch(`${API}/api/profile/${viewUsername}`);
+      if (!res.ok) { document.getElementById("profileDisplayName").textContent = "User not found"; return; }
+      populate(await res.json(), false);
+    } else {
+      if (!token) { window.location.href = "index.html"; return; }
+      const res = await fetch(`${API}/api/profile/me`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) { window.location.href = "index.html"; return; }
+      const data = await res.json();
+      populate(data, true);
+      document.getElementById("editSection").style.display = "block";
+      document.getElementById("privacySection").style.display = "block";
+      document.getElementById("inputDisplayName").value = data.displayName || "";
+      document.getElementById("inputUsername").value = data.username || "";
+      document.getElementById("inputBio").value = data.bio || "";
+      document.getElementById("inputLocation").value = data.location || "";
+      if (data.bio) document.getElementById("bioCount").textContent = data.bio.length + "/160";
+      Object.keys(privPrefs).forEach(k => {
+        const el = document.getElementById("toggle" + k.charAt(0).toUpperCase() + k.slice(1));
+        if (el) el.classList.toggle("on", privPrefs[k]);
+      });
+    }
+  } catch (err) {
+    console.error("Profile load error:", err);
+    document.getElementById("profileDisplayName").textContent = "Error loading profile";
+  }
+}
+
+async function saveProfile() {
+  const displayName = document.getElementById("inputDisplayName").value.trim();
+  const username = document.getElementById("inputUsername").value.trim();
+  const bio = document.getElementById("inputBio").value.trim();
+  const location = document.getElementById("inputLocation").value.trim();
+  const msg = document.getElementById("profileMsg");
+
+  try {
+    const res = await fetch(`${API}/api/profile/me`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ displayName, username, bio, location })
+    });
+    const data = await res.json();
+    if (!res.ok) { msg.style.color = "#dc2626"; msg.textContent = data.error || "Failed to update"; return; }
+    msg.style.color = "#16a34a"; msg.textContent = "✓ Profile updated successfully!";
+    const newDisplay = data.displayName || (username ? "@"+username : displayName);
+    localStorage.setItem("veridex_displayName", newDisplay);
+    if (data.username) localStorage.setItem("veridex_username", data.username);
+    document.getElementById("profileDisplayName").textContent = newDisplay;
+    document.getElementById("profileAvatar").textContent = newDisplay.replace("@","")[0].toUpperCase();
+    document.getElementById("profileUsernameTag").textContent = data.username ? "@"+data.username : "";
+    document.getElementById("profileBio").textContent = bio || "No bio yet.";
+    document.getElementById("profileLocation").textContent = location ? "📍 "+location : "";
+    setTimeout(() => { msg.textContent = ""; }, 3000);
+  } catch (err) {
+    msg.style.color = "#dc2626"; msg.textContent = "An error occurred. Please try again.";
+  }
+}
+
+loadProfile();
+</script>
+</body>
+</html>

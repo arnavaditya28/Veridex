@@ -5,18 +5,16 @@
   <title>Submit Claim | Veridex</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/auth.css">
-
-  <!-- 🔥 ADD THIS -->
   <style>
     .error-text {
       color: #dc2626;
-      font-size: 14px;
+      font-size: 13px;
       margin-top: 6px;
+      min-height: 18px;
+      display: none;
     }
-
     .loader {
-      width: 16px;
-      height: 16px;
+      width: 16px; height: 16px;
       border: 2px solid white;
       border-top: 2px solid transparent;
       border-radius: 50%;
@@ -24,15 +22,30 @@
       animation: spin 0.7s linear infinite;
       margin-left: 8px;
     }
+    .hidden { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    .hidden {
-      display: none;
+    /* Char counter */
+    .claim-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 4px;
     }
+    #claimCharCount {
+      font-size: 12px;
+      color: #94a3b8;
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+    #claimCharCount.over { color: #dc2626; font-weight: 600; }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
+    /* Allowed chars hint */
+    .claim-hint {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 6px;
+      line-height: 1.5;
     }
   </style>
 </head>
@@ -42,31 +55,22 @@
   <header class="navbar">
     <div class="logo">
       Veridex
-      <span class="logo-tagline">
-        Public Information Reliability
-      </span>
+      <span class="logo-tagline">Public Information Reliability</span>
     </div>
-
     <nav>
       <a href="index.html">Home</a>
       <a href="submit.html" class="active">Submit Claim</a>
       <a href="discussion.html">Discussion</a>
       <a href="about.html">About</a>
+      <a href="profile.html" id="profileNavLink" class="hidden">Profile</a>
       <a href="moderator.html" style="display:none;">Moderator</a>
-
-      <button id="openAuthModal" class="auth-btn">
-        Login / Signup
-      </button>
-
-      <button id="logoutBtn" class="auth-btn hidden">
-        Logout
-      </button>
+      <button id="openAuthModal" class="auth-btn">Login / Signup</button>
+      <button id="logoutBtn" class="auth-btn hidden">Logout</button>
     </nav>
   </header>
 
   <section class="submit-dark">
 
-    <!-- HEADER -->
     <div class="submit-header">
       <h1>Submit a Public Claim</h1>
       <p>
@@ -76,16 +80,12 @@
       </p>
     </div>
 
-    <!-- LOGIN / VERIFY BLOCK -->
     <div id="loginBlock" class="login-required">
       <h2>Login Required</h2>
       <p>You must sign up or login to submit a public claim.</p>
-      <button onclick="document.getElementById('openAuthModal').click()">
-        Login / Signup
-      </button>
+      <button onclick="document.getElementById('openAuthModal').click()">Login / Signup</button>
     </div>
 
-    <!-- STEP INDICATOR -->
     <div class="submit-steps">
       <div class="step-bubble active">1</div>
       <div class="step-line"></div>
@@ -94,57 +94,58 @@
       <div class="step-bubble">3</div>
     </div>
 
-    <!-- MAIN FORM CONTAINER -->
-    <div id="submitContainer"
-         class="submit-panel hidden">
+    <div id="submitContainer" class="submit-panel hidden">
 
       <!-- STEP 1 -->
       <div class="submit-step">
         <h2>Step 1 · Describe the Claim</h2>
         <p class="step-desc">
-          Enter the claim exactly as it is being
-          shared publicly. Avoid personal opinions.
+          Enter the claim exactly as it is being shared publicly.
+          Avoid personal opinions. Only letters, numbers, spaces and
+          <code>. , %</code> are allowed.
         </p>
 
-        <textarea
-          id="claimText"
-          placeholder="Example: Government announces national digital policy update">
-        </textarea>
+        <textarea id="claimText" maxlength="300"
+          placeholder="Example: Government announces national digital policy update in 2025"></textarea>
 
-        <!-- 🔥 CLAIM ERROR -->
-        <p id="claimError" class="error-text"></p>
+        <div class="claim-meta">
+          <p id="claimError" class="error-text"></p>
+          <span id="claimCharCount">0 / 300</span>
+        </div>
+
+        <p class="claim-hint">
+          ✅ Allowed: letters, numbers, space, <strong>. , %</strong> &nbsp;|&nbsp;
+          ❌ Not allowed: @ # $ ! ? / &amp; emojis or symbols &nbsp;|&nbsp;
+          Min 10 · Max 300 characters
+        </p>
       </div>
 
-      <!-- STEP 2 MULTIPLE SOURCES -->
+      <!-- STEP 2 -->
       <div class="submit-step">
         <h2>Step 2 · Provide Supporting References</h2>
         <p class="step-desc">
-          Add one or more references. Multiple credible
-          and diverse sources increase reliability score.
+          Add at least one reference. Use credible and diverse sources
+          to increase the reliability score. Maximum 5 sources.
         </p>
 
         <div id="sourcesContainer"></div>
 
-        <button type="button"
-                id="addSourceBtn"
-                class="add-source-btn">
+        <button type="button" id="addSourceBtn" class="add-source-btn">
           + Add Another Source
         </button>
 
-        <!-- 🔥 SOURCE ERROR -->
         <p id="sourceError" class="error-text"></p>
       </div>
 
       <!-- STEP 3 -->
       <div class="submit-step final">
-        <h2>Step 3 · Review & Submit</h2>
+        <h2>Step 3 · Review &amp; Submit</h2>
         <p class="step-desc">
-          Veridex evaluates claims using deterministic
-          weighted scoring based on source credibility,
-          diversity, and freshness.
+          Veridex evaluates claims using deterministic weighted scoring
+          based on source credibility, diversity, and freshness.
+          Uploaded PDFs are checked for relevance to your claim.
         </p>
 
-        <!-- 🔥 UPDATED BUTTON -->
         <button id="submitBtn">
           <span id="btnText">Submit Claim</span>
           <span id="btnLoader" class="loader hidden"></span>
@@ -157,50 +158,26 @@
       </div>
 
     </div>
-
   </section>
 
   <footer class="footer">
-    <p>
-      © 2026 Veridex · Public Information Reliability Platform
-    </p>
+    <p>© 2026 Veridex · Public Information Reliability Platform</p>
   </footer>
 
   <!-- AUTH MODAL -->
   <div id="authModal" class="auth-modal hidden">
     <div class="auth-box">
-
-      <span id="closeAuthModal"
-            class="close-btn">&times;</span>
-
+      <span id="closeAuthModal" class="close-btn">&times;</span>
       <h2 id="authTitle">Login</h2>
-
-      <input type="email"
-             id="authEmail"
-             placeholder="Email">
-
-      <input type="password"
-             id="authPassword"
-             placeholder="Password">
-
-      <button id="authSubmitBtn">
-        Login
-      </button>
-
-      <p class="switch-text">
-        <span id="switchAuthMode">
-          Don't have an account? Signup
-        </span>
-      </p>
-
-      <p id="authMessage"
-         class="auth-message"></p>
-
+      <input type="email" id="authEmail" placeholder="Email">
+      <input type="password" id="authPassword" placeholder="Password">
+      <button id="authSubmitBtn">Login</button>
+      <p class="switch-text"><span id="switchAuthMode">Don't have an account? Signup</span></p>
+      <p id="authMessage" class="auth-message"></p>
     </div>
   </div>
 
   <script src="./js/app.js"></script>
   <script src="./js/submit.js"></script>
-
 </body>
 </html>

@@ -3,176 +3,142 @@
 <head>
   <meta charset="UTF-8" />
   <title>Veridex | Discussion</title>
-
-  <!-- Main styles -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/discussion.css" />
   <link rel="stylesheet" href="css/auth.css" />
-
-  <!-- Icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-  />
 </head>
 <body>
 
-<!-- ================= NAVBAR (Unified) ================= -->
 <header class="navbar">
-  <div class="logo">
-    Veridex
-    <span class="logo-tagline">Public Information Reliability</span>
-  </div>
-
+  <div class="logo">Veridex <span class="logo-tagline">Public Information Reliability</span></div>
   <nav>
     <a href="index.html">Home</a>
     <a href="submit.html">Submit Claim</a>
     <a href="discussion.html" class="active">Discussion</a>
     <a href="about.html">About</a>
     <a href="moderator.html" style="display:none;">Moderator</a>
-
+    <a href="profile.html" id="profileNavLink" class="hidden">Profile</a>
     <button id="openAuthModal" class="auth-btn">Login / Signup</button>
     <button id="logoutBtn" class="auth-btn hidden">Logout</button>
   </nav>
 </header>
 
-<!-- ================= HERO STRIP ================= -->
 <section class="discussion-hero">
   <div class="discussion-hero-content">
     <h1>Community Discussion</h1>
-    <p>Structured responses and analytical dialogue around this claim.</p>
+    <p>Open platform — share thoughts, links, images and polls with the community.</p>
   </div>
 </section>
 
-<!-- ================= MAIN ================= -->
 <main class="container">
 
-  <!-- ================= CLAIM CARD ================= -->
-  <section class="card claim-card">
-    <h2 id="claimText">Discussion</h2>
-    <p id="claimStatus">Community responses around this claim</p>
-
-    <div class="meter">
-      <span id="maturityText">Discussion maturity: Low</span>
-      <div class="meter-bar">
-        <div id="maturityFill"></div>
-      </div>
+  <section class="card ai-summary-card">
+    <div class="ai-summary-header">
+      <span>🤖 Discussion Insights</span>
+      <span class="ai-badge">live</span>
     </div>
+    <div id="aiSummaryContent"><p class="ai-empty">Loading...</p></div>
   </section>
 
-  <!-- ================= AI SUMMARY ================= -->
-  <section class="card ai-summary">
-    <div class="ai-header" onclick="toggleAISummary()">
-      🤖 AI-assisted discussion summary
-      <span class="ai-note">(informational only)</span>
-    </div>
-
-    <div id="aiContent" class="hidden">
-      <ul id="aiPoints"></ul>
-    </div>
+  <section class="tag-filter-bar">
+    <span class="tag-filter-label">Filter:</span>
+    <button class="tag-filter-btn" data-tag="Source" onclick="setTagFilter('Source')" style="--tc:#0ea5e9">📄 Source</button>
+    <button class="tag-filter-btn" data-tag="Opinion" onclick="setTagFilter('Opinion')" style="--tc:#8b5cf6">🧠 Opinion</button>
+    <button class="tag-filter-btn" data-tag="Correction" onclick="setTagFilter('Correction')" style="--tc:#f97316">❗ Correction</button>
+    <button class="tag-filter-btn" data-tag="Speculation" onclick="setTagFilter('Speculation')" style="--tc:#eab308">⚠️ Speculation</button>
   </section>
 
-  <!-- ================= SORT + SEARCH ================= -->
-  <section class="card">
+  <section class="card controls-card">
     <div class="sort-bar">
-      <span class="active" onclick="setSort('top')">🔥 Top</span>
-      <span onclick="setSort('new')">🆕 New</span>
-      <span onclick="setSort('discussed')">💬 Discussed</span>
+      <span onclick="setSort('new', this)" class="active">🆕 New</span>
+      <span onclick="setSort('top', this)">🔥 Top</span>
+      <span onclick="setSort('discussed', this)">💬 Discussed</span>
     </div>
-
-    <input
-      id="searchBox"
-      type="text"
-      placeholder="Search in discussion..."
-      oninput="render()"
-    />
+    <input id="searchBox" type="text" placeholder="Search posts..." oninput="render()" />
   </section>
 
-  <!-- ================= LOGIN REQUIRED BLOCK ================= -->
-  <section id="discussionLoginBlock" class="login-required hidden">
-    <h2>Login Required</h2>
-    <p>You must sign up or login to participate in discussion.</p>
-    <button onclick="document.getElementById('openAuthModal').click()">
-      Login / Signup
-    </button>
+  <section id="discussionLoginBlock" class="login-required disc-hidden">
+    <p>🔒 Login to post and reply</p>
+    <button onclick="document.getElementById('openAuthModal').click()">Login / Signup</button>
   </section>
 
-  <!-- ================= COMPOSER ================= -->
-  <section id="discussionComposer" class="card composer hidden">
-
+  <section id="discussionComposer" class="card composer disc-hidden">
     <div class="post-type-tabs">
       <button class="active" onclick="setPostType('text', this)">📝 Text</button>
       <button onclick="setPostType('link', this)">🔗 Link</button>
-      <button onclick="setPostType('poll', this)">📊 Poll</button>
       <button onclick="setPostType('image', this)">🖼 Image</button>
+      <button onclick="setPostType('poll', this)">📊 Poll</button>
     </div>
 
-    <textarea id="postText" placeholder="Write something..."></textarea>
+    <!-- Text (shown by default) -->
+    <textarea id="postText" placeholder="What's on your mind?"></textarea>
 
-    <input id="postLink" class="hidden" placeholder="Paste a link..." />
+    <!-- Link (hidden by default) -->
+    <input id="postLink" class="disc-hidden" placeholder="Paste a URL (https://...)" />
 
-    <input
-      id="postImage"
-      class="hidden"
-      type="file"
-      accept="image/*" 
-      multiple
-    />
-
-    <div id="pollBox" class="hidden">
-      <input id="pollQuestion" placeholder="Poll question" />
-      <input class="poll-option" placeholder="Option 1" />
-      <input class="poll-option" placeholder="Option 2" />
-      <button class="add-option" onclick="addPollOption()">+ Add option</button>
+    <!-- Image (hidden by default) -->
+    <div id="imageUploadArea" class="disc-hidden">
+      <label class="image-upload-label" for="postImageInput">
+        <span>📁 Click to choose images — multiple allowed</span>
+      </label>
+      <input type="file" id="postImageInput" accept="image/*" multiple style="display:none" />
+      <div id="imagePreviewBox" class="image-preview-box"></div>
     </div>
 
-    <select id="replyTag">
-      <option value="">No tag</option>
-      <option value="Source">📄 Source</option>
-      <option value="Opinion">🧠 Opinion</option>
-      <option value="Correction">❗ Correction</option>
-      <option value="Speculation">⚠️ Speculation</option>
-    </select>
+    <!-- Poll (hidden by default) -->
+    <div id="pollBox" class="disc-hidden">
+      <input id="pollQuestion" placeholder="Ask a question..." />
+      <div id="pollOptions">
+        <div class="poll-option-row"><input class="poll-option-input" placeholder="Option 1" /></div>
+        <div class="poll-option-row">
+          <input class="poll-option-input" placeholder="Option 2" />
+          <button class="poll-remove-btn" onclick="removePollOption(this)">✕</button>
+        </div>
+      </div>
+      <button class="add-poll-option-btn" onclick="addPollOption()">+ Add option</button>
+    </div>
 
-    <button class="post-btn" onclick="createPost()">Post</button>
+    <!-- Tag row — shown for text and link only, hidden for image and poll -->
+    <div id="tagRow" class="tag-row">
+      <label class="tag-label">Tag:</label>
+      <select id="replyTag" class="tag-select">
+        <option value="">No tag</option>
+        <option value="Source">📄 Source</option>
+        <option value="Opinion">🧠 Opinion</option>
+        <option value="Correction">❗ Correction</option>
+        <option value="Speculation">⚠️ Speculation</option>
+      </select>
+    </div>
+
+    <div class="composer-footer">
+      <button class="post-btn" id="postBtn" onclick="createPost()">Post</button>
+    </div>
   </section>
 
-  <!-- ================= FEED ================= -->
   <section id="feed"></section>
 
 </main>
 
-<!-- ================= AUTH MODAL ================= -->
 <div id="authModal" class="auth-modal hidden">
   <div class="auth-box">
     <span id="closeAuthModal" class="close-btn">&times;</span>
-
     <h2 id="authTitle">Login</h2>
-
     <input type="email" id="authEmail" placeholder="Email">
     <input type="password" id="authPassword" placeholder="Password">
-
     <button id="authSubmitBtn">Login</button>
-
-    <p class="switch-text">
-      <span id="switchAuthMode">Don't have an account? Signup</span>
-    </p>
-
+    <p class="switch-text"><span id="switchAuthMode">Don't have an account? Signup</span></p>
     <p id="authMessage" class="auth-message"></p>
   </div>
 </div>
 
-<div id="toast" class="toast hidden">
-  Link copied to clipboard
-</div>
-
-<script src="js/app.js"></script>
-<script src="js/discussion.js"></script>
+<div id="toast" class="toast hidden">🔗 Link copied!</div>
 
 <div id="imageModal" class="image-modal hidden">
   <span onclick="closeImage()" class="close-btn">&times;</span>
   <img id="fullImage">
 </div>
 
+<script src="js/app.js"></script>
+<script src="js/discussion.js"></script>
 </body>
 </html>
