@@ -13,34 +13,26 @@ const authMiddleware = async (req, res, next) => {
     }
 
     if (!token) {
-      return res.status(401).json({
-        error: "Not authorized, no token"
-      });
+      return res.status(401).json({ error: "Not authorized, no token" });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    // JWT stores "id" (set in authController generateToken)
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
-      return res.status(401).json({
-        error: "User not found"
-      });
+      return res.status(401).json({ error: "User not found" });
     }
 
     if (user.accountStatus === "suspended") {
-      return res.status(403).json({
-        error: "Account suspended"
-      });
+      return res.status(403).json({ error: "Account suspended" });
     }
 
     req.user = user;
     next();
-
   } catch (error) {
-    return res.status(401).json({
-      error: "Not authorized, token failed"
-    });
+    return res.status(401).json({ error: "Not authorized, token failed" });
   }
 };
 

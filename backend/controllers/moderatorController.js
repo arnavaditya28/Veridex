@@ -10,39 +10,26 @@ exports.getDashboard = async (req, res) => {
   try {
     const totalUsers = await User.countDocuments();
     const totalClaims = await Claim.countDocuments();
-    const suspendedUsers = await User.countDocuments({ isSuspended: true });
-    const lockedClaims = await Claim.countDocuments({ isLocked: true });
+    const suspendedUsers = await User.countDocuments({ accountStatus: "suspended" });
     const acceptedClaims = await Claim.countDocuments({ status: "accepted" });
     const flaggedClaims = await Claim.countDocuments({ status: "flagged" });
     const rejectedClaims = await Claim.countDocuments({ status: "rejected" });
     const pendingClaims = await Claim.countDocuments({ status: "pending" });
-
-    // 🆕 Derived insights
-    const activeClaims = totalClaims - lockedClaims;
-    const lockedPercentage = totalClaims
-      ? ((lockedClaims / totalClaims) * 100).toFixed(1)
-      : 0;
 
     const suspendedPercentage = totalUsers
       ? ((suspendedUsers / totalUsers) * 100).toFixed(1)
       : 0;
 
     res.json({
-  totalUsers,
-  totalClaims,
-  suspendedUsers,
-  lockedClaims,
-
-  activeClaims,
-  lockedPercentage,
-  suspendedPercentage,
-
-  // ✅ ADD THESE
-  acceptedClaims,
-  flaggedClaims,
-  rejectedClaims,
-  pendingClaims
-});
+      totalUsers,
+      totalClaims,
+      suspendedUsers,
+      suspendedPercentage,
+      acceptedClaims,
+      flaggedClaims,
+      rejectedClaims,
+      pendingClaims
+    });
   } catch (err) {
     console.error("Dashboard error:", err);
     res.status(500).json({ error: "Failed to load dashboard" });
@@ -57,32 +44,10 @@ exports.getAllClaims = async (req, res) => {
     const claims = await Claim.find()
       .populate("createdBy", "email role")
       .sort({ createdAt: -1 });
-
     res.json(claims);
   } catch (err) {
     console.error("Get claims error:", err);
     res.status(500).json({ error: "Failed to fetch claims" });
-  }
-};
-
-/* ===============================
-   LOCK CLAIM
-================================ */
-exports.lockClaim = async (req, res) => {
-  try {
-    const claim = await Claim.findById(req.params.id);
-
-    if (!claim) {
-      return res.status(404).json({ error: "Claim not found" });
-    }
-
-    claim.isLocked = true;
-    await claim.save();
-
-    res.json({ message: "Claim discussion locked successfully" });
-  } catch (err) {
-    console.error("Lock claim error:", err);
-    res.status(500).json({ error: "Failed to lock claim" });
   }
 };
 
@@ -92,13 +57,8 @@ exports.lockClaim = async (req, res) => {
 exports.removeClaim = async (req, res) => {
   try {
     const claim = await Claim.findById(req.params.id);
-
-    if (!claim) {
-      return res.status(404).json({ error: "Claim not found" });
-    }
-
+    if (!claim) return res.status(404).json({ error: "Claim not found" });
     await claim.deleteOne();
-
     res.json({ message: "Claim removed successfully" });
   } catch (err) {
     console.error("Remove claim error:", err);
@@ -112,7 +72,6 @@ exports.removeClaim = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
-
     res.json(users);
   } catch (err) {
     console.error("Get users error:", err);
@@ -126,14 +85,9 @@ exports.getAllUsers = async (req, res) => {
 exports.suspendUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    user.isSuspended = true;
+    if (!user) return res.status(404).json({ error: "User not found" });
+    user.accountStatus = "suspended";
     await user.save();
-
     res.json({ message: "User suspended successfully" });
   } catch (err) {
     console.error("Suspend user error:", err);
@@ -141,23 +95,57 @@ exports.suspendUser = async (req, res) => {
   }
 };
 
+/* ===============================
+   UNSUSPEND USER
+================================ */
+exports.unsuspendUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: "User not found" });
+    user.accountStatus = "active";
+    await user.save();
+    res.json({ message: "User unsuspended successfully" });
+  } catch (err) {
+    console.error("Unsuspend user error:", err);
+    res.status(500).json({ error: "Failed to unsuspend user" });
+  }
+};
+
+/* ===============================
+   CLAIM STATUS ACTIONS
+================================ */
 exports.acceptClaim = async (req, res) => {
-  const claim = await Claim.findById(req.params.id);
-  claim.status = "accepted";
-  await claim.save();
-  res.json({ message: "Accepted" });
+  try {
+    const claim = await Claim.findById(req.params.id);
+    if (!claim) return res.status(404).json({ error: "Claim not found" });
+    claim.status = "accepted";
+    await claim.save();
+    res.json({ message: "Accepted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to accept claim" });
+  }
 };
 
 exports.flagClaim = async (req, res) => {
-  const claim = await Claim.findById(req.params.id);
-  claim.status = "flagged";
-  await claim.save();
-  res.json({ message: "Flagged" });
+  try {
+    const claim = await Claim.findById(req.params.id);
+    if (!claim) return res.status(404).json({ error: "Claim not found" });
+    claim.status = "flagged";
+    await claim.save();
+    res.json({ message: "Flagged" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to flag claim" });
+  }
 };
 
 exports.rejectClaim = async (req, res) => {
-  const claim = await Claim.findById(req.params.id);
-  claim.status = "rejected";
-  await claim.save();
-  res.json({ message: "Rejected" });
+  try {
+    const claim = await Claim.findById(req.params.id);
+    if (!claim) return res.status(404).json({ error: "Claim not found" });
+    claim.status = "rejected";
+    await claim.save();
+    res.json({ message: "Rejected" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to reject claim" });
+  }
 };

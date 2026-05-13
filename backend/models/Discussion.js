@@ -105,6 +105,11 @@ const DiscussionSchema = new mongoose.Schema(
     content: String,
     link: String,
     image: [String],
+    tag: {
+      type: String,
+      enum: ["Source", "Opinion", "Correction", "Speculation", null],
+      default: null
+    },
 
     poll: PollSchema,
 

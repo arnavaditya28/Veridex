@@ -2,65 +2,52 @@ const mongoose = require("mongoose");
 
 const SourceSchema = new mongoose.Schema(
   {
-    /* =======================
-       CLAIM CONTEXT
-    ======================= */
     claimId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Claim",
-      required: true,
-      index: true
-    },
-
-    /* =======================
-       SOURCE IDENTITY
-    ======================= */
-    sourceType: {
-      type: String,
-      enum: ["official", "media", "user", "document"],
       required: true
     },
-
-    /* =======================
-       URL-BASED SOURCE
-    ======================= */
+    sourceType: {
+      type: String,
+      enum: ["official", "media", "document", "user"],
+      required: true
+    },
     sourceURL: {
       type: String,
+      trim: true,
       default: null
     },
-
-    /* =======================
-       FILE-BASED SOURCE
-    ======================= */
     fileName: {
       type: String,
       default: null
     },
-
     fileType: {
       type: String,
-      enum: ["pdf", "image", null], // ✅ allow null explicitly
+      enum: ["pdf", "image", null],
       default: null
     },
-
-    /* =======================
-       MODERATION / REVIEW
-    ======================= */
+    fileSize: {
+      type: Number,
+      default: null
+    },
     reviewedByMod: {
       type: Boolean,
       default: false
     },
-
+    // Matches what evaluate.js checks: "pending","relevant","irrelevant","outdated"
     reviewStatus: {
       type: String,
       enum: ["pending", "relevant", "irrelevant", "outdated"],
       default: "pending"
+    },
+    reviewNotes: {
+      type: String,
+      default: ""
     }
   },
-  {
-    timestamps: true,
-    strict: true
-  }
+  { timestamps: true }
 );
+
+SourceSchema.index({ claimId: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Source", SourceSchema);
