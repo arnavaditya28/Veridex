@@ -3,7 +3,7 @@
    Handles profile loading, editing, and badge system
 ===================================== */
 
-const API = "http://localhost:3001/api";
+const API = "https://veridex-auoq.onrender.com/api";
 const token = localStorage.getItem("veridex_token");
 
 // Check if viewing own profile or someone else's
