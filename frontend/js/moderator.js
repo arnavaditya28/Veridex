@@ -1,4 +1,4 @@
-const API = "http://localhost:3001/api/moderator";
+const API = "https://veridex-auoq.onrender.com/api/moderator";
 const token = localStorage.getItem("veridex_token");
 const role = localStorage.getItem("veridex_role");
 
