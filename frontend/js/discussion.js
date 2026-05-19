@@ -8,7 +8,7 @@ const currentRole = localStorage.getItem("veridex_role");
 const composer = document.getElementById("discussionComposer");
 const loginBlock = document.getElementById("discussionLoginBlock");
 
-const API = (typeof API_BASE !== "undefined" ? API_BASE : "http://localhost:3001");
+const API = (typeof API_BASE !== "undefined" ? API_BASE : "https://veridex-auoq.onrender.com");
 
 let posts = [];
 let currentPostType = "text";
