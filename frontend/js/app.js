@@ -1,4 +1,4 @@
-const API_BASE = "https://veridex-auoq.onrender.com";
+const API_BASE = "http://localhost:3001";
 
 /* ==========================
    AUTH STATE
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="score-label">${statusLabel}</span>
         </div>
       `;
-      card.onclick = () => { window.location.href = `discussion.html?claimId=${claim._id}`; };
+      card.onclick = () => { window.location.href = `claim.html?claimId=${claim._id}`; };
       claimsGrid.appendChild(card);
     });
   } catch (err) {

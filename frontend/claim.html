@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Veridex | Claim Detail</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">
+      Veridex
+      <span class="logo-tagline">Public Information Reliability</span>
+    </div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="submit.html">Submit Claim</a>
+      <a href="discussion.html">Discussion</a>
+      <a href="about.html">About</a>
+      <a href="profile.html" id="profileNavLink" class="hidden">Profile</a>
+      <a href="moderator.html" style="display:none;">Moderator</a>
+
+      <button id="openAuthModal" class="auth-btn">Login / Signup</button>
+      <button id="logoutBtn" class="auth-btn hidden">Logout</button>
+    </nav>
+  </header>
+
+  <!-- CLAIM DETAIL -->
+  <main class="container" style="max-width:720px;margin:32px auto;padding:0 16px;">
+    <div id="claimDetail">
+      <p style="text-align:center;color:#64748b;padding:60px 20px;">Loading claim…</p>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 Veridex · Public Information Reliability Platform</p>
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="auth-modal hidden">
+    <div class="auth-box">
+      <span id="closeAuthModal" class="close-btn">&times;</span>
+      <h2 id="authTitle">Login</h2>
+      <input type="email" id="authEmail" placeholder="Email">
+      <input type="password" id="authPassword" placeholder="Password">
+      <button id="authSubmitBtn">Login</button>
+      <p class="switch-text"><span id="switchAuthMode">Don't have an account? Signup</span></p>
+      <p id="authMessage" class="auth-message"></p>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/claim.js"></script>
+</body>
+
+</html>

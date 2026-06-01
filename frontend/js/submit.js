@@ -431,46 +431,108 @@ document.addEventListener("DOMContentLoaded", () => {
       await new Promise(r => setTimeout(r, 700));
 
       /* ── 4. Fetch updated claim with final score ─────────── */
-      const updatedRes = await fetch(`${API_BASE}/api/claims/${claimId}`);
-      const claim = await updatedRes.json();
+      btnText.textContent = "Analyzing…";
 
-      const score      = claim.reliabilityScore;
-      const confidence = claim.confidenceLevel || "Pending";
+      let score, confidence;
+      let aiAnalysis = [], aiEnabled = false, ruleBreakdown = [];
+      try {
+        const evalRes = await fetch(`${API_BASE}/api/evaluate/${claimId}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${currentToken}` }
+        });
+        if (evalRes.ok) {
+          const evalData = await evalRes.json();
+          score         = evalData.totalScore;
+          confidence    = evalData.confidenceLevel || "Pending";
+          aiAnalysis    = Array.isArray(evalData.aiAnalysis) ? evalData.aiAnalysis : [];
+          aiEnabled     = !!evalData.aiEnabled;
+          ruleBreakdown = Array.isArray(evalData.ruleBreakdown) ? evalData.ruleBreakdown : [];
+        }
+      } catch (e) {
+        console.error("Evaluation error:", e);
+      }
+
+      if (score === undefined || score === null) {
+        try {
+          const updatedRes = await fetch(`${API_BASE}/api/claims/${claimId}`);
+          const claim = await updatedRes.json();
+          score      = claim.reliabilityScore;
+          confidence = claim.confidenceLevel || "Pending";
+        } catch (_) {}
+      }
 
       /* ── 5. Build score breakdown rows ──────────────────────*/
+      const esc = (s) => String(s == null ? "" : s).replace(/[<>]/g, "");
       let breakdownRows = "";
-      let runningTotal  = 0;
-      const uniqueTypes = new Set(sourcesData.map(s => s.type));
-
-      sourcesData.forEach(s => {
-        const pts = TYPE_SCORES[s.type] || 0;
-        runningTotal += pts;
-        breakdownRows += `<tr>
-          <td style="padding:8px 16px;">${TYPE_LABELS[s.type]}</td>
-          <td style="padding:8px 16px;color:#16a34a;font-weight:600">+${pts}</td>
-        </tr>`;
-      });
-      if (uniqueTypes.size >= 2) {
-        breakdownRows += `<tr>
-          <td style="padding:8px 16px;">🌐 Source diversity bonus (2+ types)</td>
-          <td style="padding:8px 16px;color:#16a34a;font-weight:600">+10</td>
-        </tr>`;
-        runningTotal += 10;
+      if (ruleBreakdown.length) {
+        breakdownRows = ruleBreakdown.map(line => {
+          const negative = /(^|\s)-\d/.test(line) || /capped/i.test(line);
+          const color = negative ? "#dc2626" : "#16a34a";
+          return `<tr><td colspan="2" style="padding:8px 16px;color:${color};">${esc(line)}</td></tr>`;
+        }).join("");
+      } else {
+        const uniqueTypes = new Set(sourcesData.map(s => s.type));
+        sourcesData.forEach(s => {
+          const pts = TYPE_SCORES[s.type] || 0;
+          breakdownRows += `<tr><td colspan="2" style="padding:8px 16px;color:#16a34a;">${TYPE_LABELS[s.type]} +${pts}</td></tr>`;
+        });
+        if (uniqueTypes.size >= 2) breakdownRows += `<tr><td colspan="2" style="padding:8px 16px;color:#16a34a;">🌐 Source diversity bonus +10</td></tr>`;
+        if (uniqueTypes.size >= 3) breakdownRows += `<tr><td colspan="2" style="padding:8px 16px;color:#16a34a;">🌐 Strong diversity bonus +10</td></tr>`;
       }
-      if (uniqueTypes.size >= 3) {
-        breakdownRows += `<tr>
-          <td style="padding:8px 16px;">🌐 Strong diversity bonus (3+ types)</td>
-          <td style="padding:8px 16px;color:#16a34a;font-weight:600">+10</td>
-        </tr>`;
-        runningTotal += 10;
-      }
-      breakdownRows += `<tr>
-        <td style="padding:8px 16px;">⏱️ Freshness bonus (submitted today)</td>
-        <td style="padding:8px 16px;color:#16a34a;font-weight:600">+10</td>
-      </tr>`;
-      runningTotal += 10;
 
-      const displayScore = (score !== null && score !== undefined) ? score : Math.min(runningTotal, 100);
+      const displayScore = (score !== null && score !== undefined) ? score : 0;
+
+      const STANCE_META = {
+        supports:    { icon: "✅", color: "#16a34a", label: "Supports" },
+        contradicts: { icon: "❌", color: "#dc2626", label: "Contradicts" },
+        unrelated:   { icon: "⚠️", color: "#d97706", label: "Unrelated" },
+        unanalyzed:  { icon: "➖", color: "#94a3b8", label: "Not analyzed" }
+      };
+      const aiAnalyzedCount = aiAnalysis.filter(a => a.stance && a.stance !== "unanalyzed").length;
+      const aiSection = (aiEnabled && aiAnalyzedCount > 0)
+        ? `<div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:10px;padding:14px 16px;margin-bottom:16px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto;">
+            <div style="font-size:13px;font-weight:700;color:#7e22ce;margin-bottom:10px;">🤖 AI Evidence Check</div>
+            ${aiAnalysis.map((a, i) => {
+              const m = STANCE_META[a.stance] || STANCE_META.unanalyzed;
+              return `<div style="margin-bottom:10px;${i < aiAnalysis.length - 1 ? "padding-bottom:8px;border-bottom:1px solid #f3e8ff;" : ""}">
+                <div>
+                  <span style="font-size:12px;font-weight:700;color:${m.color};">${m.icon} ${m.label}</span>
+                  <span style="font-size:11px;color:#94a3b8;text-transform:capitalize;margin-left:6px;">${esc(a.sourceType)} source</span>
+                </div>
+                ${a.reason ? `<div style="font-size:11px;color:#475569;margin-top:3px;line-height:1.4;">${esc(a.reason)}</div>` : ""}
+              </div>`;
+            }).join("")}
+            <div style="font-size:10px;color:#a78bfa;margin-top:4px;">Analyzed by Gemini · PDF sources only</div>
+          </div>`
+        : "";
+
+      let history = [];
+      try {
+        const histRes = await fetch(`${API_BASE}/api/evaluate/${claimId}/history`);
+        if (histRes.ok) history = await histRes.json();
+      } catch (_) {}
+
+      const historySection = (Array.isArray(history) && history.length > 1)
+        ? `<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;max-width:420px;margin:0 auto 20px;overflow:hidden;text-align:left;">
+            <div style="padding:12px 16px;background:#f8fafc;border-bottom:1px solid #e2e8f0;">
+              <span style="font-weight:700;font-size:14px;color:#1e293b;">📈 Reliability History</span>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:90px;padding:14px 14px 4px;">
+              ${history.map(h => {
+                const sc = Math.max(0, Math.min(100, h.reliabilityScore ?? 0));
+                const c = sc < 40 ? "#dc2626" : sc < 70 ? "#f59e0b" : "#16a34a";
+                return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;">
+                  <span style="font-size:11px;font-weight:700;color:${c};margin-bottom:2px;">${sc}</span>
+                  <div style="width:100%;max-width:34px;height:${Math.max(6, sc)}%;background:${c};border-radius:4px 4px 0 0;"></div>
+                </div>`;
+              }).join("")}
+            </div>
+            <div style="display:flex;gap:6px;padding:0 14px 12px;">
+              ${history.map(h => `<div style="flex:1;text-align:center;font-size:9px;color:#94a3b8;line-height:1.2;">${esc(h.note || "")}</div>`).join("")}
+            </div>
+          </div>`
+        : "";
+
       let scoreColor = "#16a34a";
       if (displayScore < 40) scoreColor = "#dc2626";
       else if (displayScore < 70) scoreColor = "#f59e0b";
@@ -534,7 +596,11 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
           </div>
 
+          ${historySection}
+
           ${pdfSection}
+
+          ${aiSection}
 
           <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Your claim is now under evaluation. Track it on your profile.</p>
 
