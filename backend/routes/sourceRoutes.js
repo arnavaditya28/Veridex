@@ -6,6 +6,7 @@ const upload = require("../middleware/upload");
 const Source = require("../models/Source");
 const Claim = require("../models/Claim");
 const evaluateClaim = require("../rules/evaluate");
+const recordVerification = require("../utils/recordVerification");
 const authMiddleware = require("../middleware/authMiddleware");
 const {
   validateSourceType,
@@ -81,6 +82,7 @@ router.post("/", authMiddleware, (req, res) => {
       // ── Rule 5: File type + size ──────────────────────────────
       let pdfRelevanceScore = null;
       let pdfMatchedKeywords = [];
+      let pdfExtractedText = "";
 
       if (file) {
         const fileCheck = validateFile(file);
@@ -109,6 +111,7 @@ router.post("/", authMiddleware, (req, res) => {
 
           pdfRelevanceScore = pdfCheck.relevanceScore ?? null;
           pdfMatchedKeywords = pdfCheck.matchedKeywords ?? [];
+          pdfExtractedText = pdfCheck.extractedText || "";
         }
       }
 
@@ -125,6 +128,7 @@ router.post("/", authMiddleware, (req, res) => {
         sourceData.fileName = file.filename;
         sourceData.fileType = file.mimetype.includes("pdf") ? "pdf" : "image";
         sourceData.fileSize = file.size;
+        if (pdfExtractedText) sourceData.extractedText = pdfExtractedText.slice(0, 8000);
       }
 
       const source = await Source.create(sourceData);
@@ -135,6 +139,7 @@ router.post("/", authMiddleware, (req, res) => {
       claim.reliabilityScore = result.totalScore;
       claim.confidenceLevel = result.confidenceLevel;
       await claim.save();
+      await recordVerification(claim._id, result.totalScore, result.confidenceLevel, "Source added");
 
       // ── Response includes PDF relevance info if available ─────
       res.status(201).json({

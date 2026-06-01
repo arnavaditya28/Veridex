@@ -43,6 +43,21 @@ const SourceSchema = new mongoose.Schema(
     reviewNotes: {
       type: String,
       default: ""
+    },
+    // Extracted text from uploaded PDFs — used for AI evidence checking
+    extractedText: {
+      type: String,
+      default: ""
+    },
+    // Latest AI evidence-check verdict for this source
+    aiStance: {
+      type: String,
+      enum: ["", "supports", "contradicts", "unrelated", "unanalyzed"],
+      default: ""
+    },
+    aiReason: {
+      type: String,
+      default: ""
     }
   },
   { timestamps: true }

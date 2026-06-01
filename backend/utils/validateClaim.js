@@ -279,7 +279,8 @@ async function validatePDFContent(filePath, claimText) {
     return {
       valid: true,
       relevanceScore,
-      matchedKeywords: matched
+      matchedKeywords: matched,
+      extractedText: text.slice(0, 8000)
     };
 
   } catch (err) {

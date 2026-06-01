@@ -1,46 +1,27 @@
-const https = require("https");
+const nodemailer = require("nodemailer");
 
 const sendEmail = async (to, subject, text) => {
-  const data = JSON.stringify({
-    sender: { name: "Veridex", email: process.env.EMAIL_USER },
-    to: [{ email: to }],
-    subject,
-    textContent: text
-  });
-
-  return new Promise((resolve, reject) => {
-    const options = {
-      hostname: "api.brevo.com",
-      path: "/v3/smtp/email",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "api-key": process.env.BREVO_API_KEY
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
       }
-    };
-
-    const req = https.request(options, (res) => {
-      let body = "";
-      res.on("data", (chunk) => (body += chunk));
-      res.on("end", () => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          console.log("Email sent successfully");
-          resolve();
-        } else {
-          console.error("Brevo error:", body);
-          reject(new Error("Email could not be sent"));
-        }
-      });
     });
 
-    req.on("error", (error) => {
-      console.error("Email sending failed:", error);
-      reject(new Error("Email could not be sent"));
+    await transporter.sendMail({
+      from: `"Veridex" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      text
     });
 
-    req.write(data);
-    req.end();
-  });
+    console.log("Email sent successfully");
+  } catch (error) {
+    console.error("Email sending failed:", error);
+    throw new Error("Email could not be sent");
+  }
 };
 
 module.exports = sendEmail;
