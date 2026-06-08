@@ -82,11 +82,21 @@ Veridex/
 │   └── server.js       # App entry point
 └── frontend/           # HTML/CSS/JS + Bootstrap (index, submit, discussion, profile, moderator, about)
 ```
+<img width="1001" height="485" alt="10" src="https://github.com/user-attachments/assets/8bf1313a-c987-4c5e-8eea-58079b3ca200" />
 
-## Demo
+<img width="999" height="461" alt="11" src="https://github.com/user-attachments/assets/0e054d71-c368-4b63-995d-46211c0213e5" />
 
-- **Live demo:** _add link if deployed_
-- **Demo video:** _add YouTube/Drive link to your testing video_
+<img width="695" height="906" alt="16" src="https://github.com/user-attachments/assets/b25b7c1b-12fe-4502-81ca-a6065a1002ca" />
+
+<img width="1253" height="579" alt="27" src="https://github.com/user-attachments/assets/9860ea68-55ca-4100-bb60-fb91ff7f07c0" />
+
+
+
+## Veridex - Testing
+
+https://drive.google.com/file/d/1Tf7A-OCwbbimbSOFDfW5H3puRgPO7Nwx/view?usp=drive_link
+
+
 
 ## License
 
